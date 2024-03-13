@@ -2,6 +2,7 @@
 
 namespace App\Domains\Auth\Http\Controllers\Backend\User;
 
+use App\Http\Controllers\Controller;
 use App\Domains\Auth\Http\Requests\Backend\User\DeleteUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\EditUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\StoreUserRequest;
@@ -14,7 +15,7 @@ use App\Domains\Auth\Services\UserService;
 /**
  * Class UserController.
  */
-class UserConttroller
+class UserController extends Controller
 {
     /**
      * @var UserService
@@ -35,18 +36,21 @@ class UserConttroller
      * UserController constructor.
      *
      * @param  UserService  $userService
- 
+     * @param  RoleService  $roleService
      * @param  PermissionService  $permissionService
      */
-    public function __construct(UserService $userService,   PermissionService $permissionService)
-    {
+    public function __construct(
+        UserService $userService,
+        RoleService $roleService,
+        PermissionService $permissionService
+    ) {
         $this->userService = $userService;
-
+        $this->roleService = $roleService;
         $this->permissionService = $permissionService;
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function index()
     {
@@ -54,7 +58,7 @@ class UserConttroller
     }
 
     /**
-     * @return mixed
+     * @return \Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -66,7 +70,7 @@ class UserConttroller
 
     /**
      * @param  StoreUserRequest  $request
-     * @return mixed
+     * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \App\Exceptions\GeneralException
      * @throws \Throwable
@@ -80,7 +84,7 @@ class UserConttroller
 
     /**
      * @param  User  $user
-     * @return mixed
+     * @return \Illuminate\Contracts\View\View
      */
     public function show(User $user)
     {
@@ -91,7 +95,7 @@ class UserConttroller
     /**
      * @param  EditUserRequest  $request
      * @param  User  $user
-     * @return mixed
+     * @return \Illuminate\Contracts\View\View
      */
     public function edit(EditUserRequest $request, User $user)
     {
@@ -106,7 +110,7 @@ class UserConttroller
     /**
      * @param  UpdateUserRequest  $request
      * @param  User  $user
-     * @return mixed
+     * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \Throwable
      */
@@ -118,7 +122,7 @@ class UserConttroller
     /**
      * @param  DeleteUserRequest  $request
      * @param  User  $user
-     * @return mixed
+     * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \App\Exceptions\GeneralException
      */
@@ -126,6 +130,14 @@ class UserConttroller
     {
         $this->userService->delete($user);
 
-        return redirect()->route('admin.auth.user.deleted')->withFlashSuccess(__('The user was successfully deleted.'));
+        return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully deleted.'));
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function deleted()
+    {
+        // Your logic for displaying deleted users
     }
 }
