@@ -5,7 +5,10 @@
 @section('title', __('Update Role'))
 
 @section('content')
-    <x-forms.patch :action="route('admin.auth.role.update', $role)">
+    <form method="POST" action="{{ route('admin.auth.role.update', $role) }}">
+        @method('PUT')
+        @csrf
+
         <x-backend.card>
             <x-slot name="header">
                 @lang('Update Role')
@@ -44,5 +47,5 @@
                 <button class="btn btn-sm btn-primary float-right" type="submit">@lang('Update Role')</button>
             </x-slot>
         </x-backend.card>
-    </x-forms.patch>
+    </form>
 @endsection

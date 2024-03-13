@@ -8,6 +8,7 @@
     <x-forms.patch :action="route('admin.auth.user.update', $user)">
         <x-backend.card>
             <x-slot name="header">
+                
                 @lang('Update User')
             </x-slot>
 
