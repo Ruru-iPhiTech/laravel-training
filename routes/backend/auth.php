@@ -49,7 +49,7 @@ Route::group([
                     });
 
                 Route::patch('/', [UserController::class, 'update'])->name('update');
-                Route::delete('/', [UserController::class, 'destroy'])->name('destroy');
+                Route::delete('/', [UserController::class, 'destroy'])->name('destroy'); //have removed the extra colon ':'
             });
 
             Route::group(['prefix' => '{deletedUser}'], function () {
