@@ -16,8 +16,8 @@ class CreateFailedJobsTable extends Migration
         Schema::create('failed_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('uuid')->unique();
-            $table->float('connection');
-            $table->float('queue');
+            $table->string('connection');
+            $table->string('queue');
             $table->longText('payload');
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
