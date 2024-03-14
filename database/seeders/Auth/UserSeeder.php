@@ -5,6 +5,7 @@ namespace Database\Seeders\Auth;
 use App\Domains\Auth\Models\User;
 use Database\Seeders\Traits\DisableForeignKeys;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserTableSeeder.
@@ -25,8 +26,8 @@ class UserSeeder extends Seeder
             'type' => User::TYPE_ADMIN,
             'name' => 'Super Admin',
             'email' => 'admin@admin.com',
-            'confirm_password' => 'admin',
-            'password' => 'secret',
+            // 'confirm_password' => 'admin',
+            'password' => Hash::make('secret'),
             'email_verified_at' => now(),
             'active' => true,
         ]);
@@ -36,7 +37,7 @@ class UserSeeder extends Seeder
                 'type' => User::TYPE_USER,
                 'name' => 'Test User',
                 'email' => 'user@user.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'email_verified_at' => now(),
                 'active' => true,
             ]);
