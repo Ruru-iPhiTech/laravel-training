@@ -2,10 +2,10 @@
 
 namespace App\Domains\Auth\Http\Controllers\Backend\User;
 
-use App\Domains\Auth\Http\Requests\Backend\User\DeleteUserRequest;
-use App\Domains\Auth\Http\Requests\Backend\User\EditUserRequest;
-use App\Domains\Auth\Http\Requests\Backend\User\StoreUserRequest;
-use App\Domains\Auth\Http\Requests\Backend\User\UpdateUserRequest;
+use App\Domains\Auth\Http\Controllers\Requests\Backend\User\DeleteUserRequest;
+use App\Domains\Auth\Http\Controllers\Requests\Backend\User\EditUserRequest;
+use App\Domains\Auth\Http\Controllers\Requests\Backend\User\StoreUserRequest;
+use App\Domains\Auth\Http\Controllers\Requests\Backend\User\UpdateUserRequest;
 use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
