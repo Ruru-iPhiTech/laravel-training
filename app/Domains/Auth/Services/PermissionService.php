@@ -2,13 +2,12 @@
 
 namespace App\Domains\Auth\Services;
 
-use App\Domains\Auth\Models\Permission; // Add this line to import Permission model
 use App\Services\BaseService;
 
 /**
  * Class PermissionService.
  */
-class PermissionService extends BaseService // Corrected class name to remove the extra 's' in 'PermissionServices'
+class PermissionServices extends BaseService
 {
     /**
      * PermissionService constructor.
@@ -21,8 +20,6 @@ class PermissionService extends BaseService // Corrected class name to remove th
     }
 
     /**
-     * Get categorized permissions.
-     *
      * @return mixed
      */
     public function getCategorizedPermissions()
@@ -33,8 +30,6 @@ class PermissionService extends BaseService // Corrected class name to remove th
     }
 
     /**
-     * Get uncategorized permissions.
-     *
      * @return mixed
      */
     public function getUncategorizedPermissions()
