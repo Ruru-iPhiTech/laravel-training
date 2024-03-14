@@ -19,7 +19,7 @@ class CreateAnnouncementsTable extends Migration
             $table->enum('type', ['info', 'danger', 'warning', 'success'])->default('info');
             $table->text('message');
             $table->boolean('enabled')->default(true);
-            $table->unsignedTinyInteger('starts_at')->nullable();
+            $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
         });
