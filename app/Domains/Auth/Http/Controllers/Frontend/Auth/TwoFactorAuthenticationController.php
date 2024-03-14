@@ -23,6 +23,7 @@ class TwoFactorAuthenticationController
         return view('frontend.user.account.tabs.two-factor-authentication.enable')
             ->withQrCode($secret->toQr())
             ->withSecret($secret->toString());
+            
     }
 
     /**
