@@ -19,9 +19,8 @@ class CreateUsersTable extends Migration
             $table->enum('type', [User::TYPE_ADMIN, User::TYPE_USER])->default(User::TYPE_USER);
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            //make this a nullable
+            $table->timestamp('email_verified_at')->default(now());
+            $table->string('password')->nullable(); // Move password column up
             $table->timestamp('password_changed_at')->nullable();
             $table->unsignedTinyInteger('active')->default(1);
             $table->string('timezone')->nullable();
