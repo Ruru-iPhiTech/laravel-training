@@ -42,19 +42,12 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     public const TYPE_ADMIN = 'admin';
     public const TYPE_USER = 'user';
 
-
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        // Add other fillable attributes here if needed
-    ];
+  
 
     /**
      * The attributes that should be hidden for serialization.
@@ -67,17 +60,21 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
+     * @var array
+     */
+    protected $dates = [
+        'last_login_at',
+        'email_verified_at',
+        'password_changed_at',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
+    
     /**
-     * The attributes that should be appended to the model's array form.
-     *
      * @var array
      */
     protected $appends = [
@@ -85,9 +82,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
-     * The relationships that should always be loaded.
-     *
-     * @var array
+     * @var string[]
      */
     protected $with = [
         'permissions',
@@ -114,8 +109,9 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can impersonate another user.
+     * Return true or false if the user can impersonate an other user.
      *
+     * @param void
      * @return bool
      */
     public function canImpersonate(): bool
@@ -124,13 +120,14 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can be impersonated.
+     * Return true or false if the user can be impersonate.
      *
+     * @param void
      * @return bool
      */
     public function canBeImpersonated(): bool
     {
-        return !$this->isMasterAdmin();
+        return ! $this->isMasterAdmin();
     }
 
     /**
@@ -141,17 +138,5 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     protected static function newFactory()
     {
         return UserFactory::new();
-    }
-
-    /**
-     * Retrieve the recovery codes for the user.
-     *
-     * @return mixed
-     */
-    public function recoveryCodes()
-    {
-        // Implement your recovery codes retrieval logic here
-        // For example, return $this->recovery_codes if recovery codes are stored in the database
-        // Otherwise, return an array of recovery codes
     }
 }
