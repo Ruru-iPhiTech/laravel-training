@@ -14,7 +14,7 @@ use App\Domains\Auth\Services\UserService;
 /**
  * Class UserController.
  */
-class UserConttroller
+class UserController
 {
     /**
      * @var UserService
