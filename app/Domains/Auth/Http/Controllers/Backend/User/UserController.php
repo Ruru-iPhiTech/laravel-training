@@ -69,17 +69,19 @@ class UserController extends Controller
     }
 
     /**
-     * @param  StoreUserRequest  $request
+     * @param  UpdateUserRequest  $request
+     * @param  User  $user
      * @return \Illuminate\Http\RedirectResponse
      *
-     * @throws \App\Exceptions\GeneralException
      * @throws \Throwable
      */
-    public function store(StoreUserRequest $request)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $user = $this->userService->store($request->validated());
+        // Update the user details with the validated data from the request
+        $this->userService->update($user, $request->validated());
 
-        return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully created.'));
+        // Redirect to the user show page with a success flash message
+        return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
     }
 
     /**
@@ -105,18 +107,6 @@ class UserController extends Controller
             ->withCategories($this->permissionService->getCategorizedPermissions())
             ->withGeneral($this->permissionService->getUncategorizedPermissions())
             ->withUsedPermissions($user->permissions->modelKeys());
-    }
-
-    /**
-     * @param  UpdateUserRequest  $request
-     * @param  User  $user
-     * @return \Illuminate\Http\RedirectResponse
-     *
-     * @throws \Throwable
-     */
-    public function update(UpdateUserRequest $request, User $user)
-    {
-        return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
     }
 
     /**

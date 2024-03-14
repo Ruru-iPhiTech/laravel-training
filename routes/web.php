@@ -51,6 +51,8 @@ Route::post('/admin/users', [UserController::class, 'store'])->name('admin.auth.
 
 
 // Admin roles
+Route::put('/admin/roles/{role}', [RoleController::class, 'roleUpdate'])->name('admin.auth.role.update');
+
 Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.auth.role.create');
 Route::post('/admin/roles/store', [RoleController::class, 'store'])->name('admin.auth.role.store');
 Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])->name('admin.auth.role.edit');
