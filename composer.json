@@ -26,7 +26,7 @@
         "rappasoft/laravel-livewire-tables": "^1.0",
         "rappasoft/lockout": "^3.0",
         "spatie/laravel-activitylog": "^3.14",
-        "spatie/laravel-permission": "^3.11",
+        "spatie/laravel-permission": "*",
         "tabuna/breadcrumbs": "^2.2"
     },
     "require-dev": {
@@ -98,7 +98,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
