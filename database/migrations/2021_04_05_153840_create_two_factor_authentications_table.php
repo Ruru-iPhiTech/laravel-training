@@ -26,7 +26,7 @@ class CreateTwoFactorAuthenticationsTable extends Migration
             $table->text('recovery_codes')->nullable();
             $table->timestamp('recovery_codes_generated_at')->nullable();
             $table->text('safe_devices')->nullable();
-            $table->timestampsTz();
+            $table->timestamps();
         });
     }
     
