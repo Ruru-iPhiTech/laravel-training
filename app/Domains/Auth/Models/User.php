@@ -47,6 +47,10 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
      *
      * @var array
      */
+
+    protected $fillable = [
+        'last_login_at',
+    ];
   
 
     /**
