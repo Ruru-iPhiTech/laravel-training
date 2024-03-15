@@ -15,7 +15,7 @@ Route::get('lang/{lang}', [LocaleController::class, 'change'])->name('locale.cha
 /*
  * Frontend Routes
  */
-Route::group(['as' => 'admin.'], function () {
+Route::group(['as' => 'frontend.'], function () {
     includeRouteFiles(__DIR__.'/frontend/');
 });
 
