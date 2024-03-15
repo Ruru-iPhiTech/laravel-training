@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
 use App\Domains\Auth\Http\Controllers\Backend\User\DeactivatedUserController;
 use App\Domains\Auth\Http\Controllers\Backend\User\DeletedUserController;
@@ -12,8 +13,8 @@ use Tabuna\Breadcrumbs\Trail;
 
 // All route names are prefixed with 'admin.auth'.
 Route::group([
-    'prefix' => 'auth',
-    'as' => 'auth.',
+    'prefix' => 'admin/auth',
+    'as' => 'admin.auth.',
     'middleware' => config('boilerplate.access.middleware.confirm'),
 ], function () {
     Route::group([
