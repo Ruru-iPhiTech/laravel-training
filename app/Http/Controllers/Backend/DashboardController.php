@@ -13,6 +13,5 @@ class DashboardController
     public function index()
     {
         return view('backend.dashboard');
-        // view files
     }
 }
