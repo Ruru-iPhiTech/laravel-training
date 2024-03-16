@@ -6,48 +6,28 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\UserService;
 use Illuminate\Http\Request;
 
-/**
- * Class UserStatusController.
- */
 class DeactivatedUserController
 {
-    /**
-     * @var UserService
-     */
     protected $userService;
 
-    /**
-     * DeactivatedUserController constructor.
-     *
-     * @param  UserService  $userService
-     */
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
 
-    /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
     public function index()
     {
-        return view('backend.auth.user.deactivated');
+        $deactivatedUsers = User::onlyTrashed()->get();
+        return view('backend.auth.user.deactivated')->withDeactivatedUsers($deactivatedUsers);
     }
 
-    /**
-     * @param  Request  $request
-     * @param  User  $user
-     * @param $status
-     * @return mixed
-     *
-     * @throws \App\Exceptions\GeneralException
-     */
-    public function update(Request $request, User $user, $status)
+    public function update(Request $request, $id, $status)
     {
-        $this->userService->mark($user, (int) $status);
+        $user = User::withTrashed()->findOrFail($id); // Find the soft deleted user by ID
+        $user->update(['deleted_at' => ($status == 1) ? null : now()]); // Activate or deactivate the user based on $status
 
         return redirect()->route(
-            (int) $status === 1 || ! $request->user()->can('admin.access.user.reactivate') ?
+            ($status == 1) ?
                 'admin.auth.user.index' :
                 'admin.auth.user.deactivated'
         )->withFlashSuccess(__('The user was successfully updated.'));

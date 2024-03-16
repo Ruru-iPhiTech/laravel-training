@@ -30,11 +30,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'admin'], f
 });
 
 Route::get('/admin/users', [UserController::class, 'index'])->name('admin.auth.user.index');
-
 Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.auth.role.index');
 
-// User roles
-Route::get('/admin/users/deactivated', [UserController::class, 'deactivated'])->name('admin.auth.user.deactivated');
+// User routes
 Route::get('/admin/users/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
 Route::get('/admin/users/create', [UserController::class, 'create'])->name('admin.auth.user.create');
 Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.auth.user.show');
@@ -45,16 +43,18 @@ Route::get('/admin/users/clear-session', [UserController::class, 'clearSession']
 Route::post('/admin/users/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
 Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.auth.user.update');
 Route::post('/admin/users', [UserController::class, 'store'])->name('admin.auth.user.store');
+Route::delete('/admin/users/clear-session/{user}', [UserController::class, 'clearSession'])->name('admin.auth.user.clear-session');
 
 
+// Deactivate user
+Route::patch('/admin/users/{id}/deactivate', [UserController::class, 'deactivate'])->name('admin.auth.user.deactivate');
 
+// Restore user
+Route::patch('/admin/users/{id}/restore', [UserController::class, 'restore'])->name('admin.auth.user.restore');
 
-
-// Admin roles
+// Role routes
 Route::put('/admin/roles/{role}', [RoleController::class, 'roleUpdate'])->name('admin.auth.role.update');
-
 Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.auth.role.create');
 Route::post('/admin/roles/store', [RoleController::class, 'store'])->name('admin.auth.role.store');
 Route::get('/admin/roles/{role}/edit', [RoleController::class, 'edit'])->name('admin.auth.role.edit');
 Route::delete('/admin/roles/{role}', [RoleController::class, 'destroy'])->name('admin.auth.role.destroy');
-Route::put('/admin/roles/{role}', [RoleController::class, 'update'])->name('admin.auth.role.update');

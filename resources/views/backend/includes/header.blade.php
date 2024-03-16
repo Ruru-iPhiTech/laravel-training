@@ -35,9 +35,12 @@
         <li class="c-header-nav-item dropdown">
             <x-utils.link class="c-header-nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                 <x-slot name="text">
+                    @if(auth()->check() && auth()->user()?->avatar)
                     <div class="c-avatar">
-                        <img class="c-avatar-img" src="{{ $logged_in_user->avatar }}" alt="{{ $logged_in_user->email ?? '' }}">
+                        <img class="c-avatar-img" src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->email ?? '' }}">
                     </div>
+                @endif
+                
                 </x-slot>
             </x-utils.link>
 

@@ -18,7 +18,7 @@
                 :text="__('Dashboard')" />
         </li>
 
-        @if (
+        @if ($logged_in_user && (
             $logged_in_user->hasAllAccess() ||
             (
                 $logged_in_user->can('admin.access.user.list') ||
@@ -28,7 +28,7 @@
                 $logged_in_user->can('admin.access.user.impersonate') ||
                 $logged_in_user->can('admin.access.user.change-password')
             )
-        )
+        ))
             <li class="c-sidebar-nav-title">@lang('System')</li>
 
             <li class="c-sidebar-nav-dropdown {{ activeClass(Route::is('admin.auth.user.*') || Route::is('admin.auth.role.*'), 'c-open c-show') }}">
@@ -39,7 +39,7 @@
                     :text="__('Access')" />
 
                 <ul class="c-sidebar-nav-dropdown-items">
-                    @if (
+                    @if ($logged_in_user && (
                         $logged_in_user->hasAllAccess() ||
                         (
                             $logged_in_user->can('admin.access.user.list') ||
@@ -49,7 +49,7 @@
                             $logged_in_user->can('admin.access.user.impersonate') ||
                             $logged_in_user->can('admin.access.user.change-password')
                         )
-                    )
+                    ))
                         <li class="c-sidebar-nav-item">
                             <x-utils.link
                                 :href="route('admin.auth.user.index')"
@@ -59,7 +59,7 @@
                         </li>
                     @endif
 
-                    @if ($logged_in_user->hasAllAccess())
+                    @if ($logged_in_user && $logged_in_user->hasAllAccess())
                         <li class="c-sidebar-nav-item">
                             <x-utils.link
                                 :href="route('admin.auth.role.index')"
@@ -72,7 +72,7 @@
             </li>
         @endif
 
-        @if ($logged_in_user->hasAllAccess())
+        @if ($logged_in_user && $logged_in_user->hasAllAccess())
             <li class="c-sidebar-nav-dropdown">
                 <x-utils.link
                     href="#"
