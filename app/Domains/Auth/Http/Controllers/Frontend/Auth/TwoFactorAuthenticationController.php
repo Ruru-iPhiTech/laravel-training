@@ -15,7 +15,7 @@ class TwoFactorAuthenticationController
      */
     public function create(Request $request)
     {
-        $secret = $request->user()->createTwoFactorAuth2();
+        $secret = $request->user()->createTwoFactorAuth();
 
         return view('frontend.user.account.tabs.two-factor-authentication.enable')
             ->withQrCode($secret->toQr())
