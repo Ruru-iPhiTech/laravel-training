@@ -14,6 +14,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -47,11 +48,12 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
      *
      * @var array
      */
-
     protected $fillable = [
+        'type',
+        'name',
+        'email',
         'last_login_at',
     ];
-  
 
     /**
      * The attributes that should be hidden for serialization.
@@ -64,6 +66,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
+     * The attributes that should be cast.
+     *
      * @var array
      */
     protected $dates = [
@@ -73,12 +77,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
-     * The attributes that should be cast.
+     * The attributes that should be appended to the model's array form.
      *
-     * @var array
-     */
-    
-    /**
      * @var array
      */
     protected $appends = [
@@ -87,6 +87,9 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
 
     /**
      * @var string[]
+     * Eager load relationships.
+     *
+     * @var array
      */
     protected $with = [
         'permissions',
@@ -106,6 +109,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
 
     /**
      * Send the registration verification email.
+     *
+     * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
@@ -113,8 +118,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can impersonate an other user.
-     *
+     * Return true or false if the user can impersonate another user.
      * @param void
      * @return bool
      */
@@ -124,7 +128,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can be impersonate.
+     * Return true or false if the user can be impersonated.
      *
      * @param void
      * @return bool
@@ -142,5 +146,27 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    /**
+     * Get the two-factor authentication record associated with the user.
+     */
+    public function laraguard(): MorphOne
+    {
+        return $this->morphOne(TwoFactorAuthentication::class, 'authenticatable');
+    }
+
+    /**
+     * Disable two-factor authentication for the user.
+     */
+    public function disableTwoFactorAuth(): void
+    {
+        // Retrieve the associated TwoFactorAuthentication record
+        $laraguard = $this->laraguard()->first();
+
+        // If a TwoFactorAuthentication record exists, delete it
+        if ($laraguard !== null) {
+            $laraguard->delete();
+        }
     }
 }
