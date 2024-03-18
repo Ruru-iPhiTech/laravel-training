@@ -47,7 +47,13 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
      *
      * @var array
      */
-  
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'email_verified_at',
+        // Add other mass assignable attributes here
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -60,21 +66,17 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
-     * @var array
-     */
-    protected $dates = [
-        'last_login_at',
-        'email_verified_at',
-        'password_changed_at',
-    ];
-
-    /**
      * The attributes that should be cast.
      *
      * @var array
      */
-    
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
     /**
+     * The accessors to append to the model's array form.
+     *
      * @var array
      */
     protected $appends = [
@@ -82,7 +84,9 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
-     * @var string[]
+     * The relationships that should always be loaded.
+     *
+     * @var array
      */
     protected $with = [
         'permissions',
@@ -109,9 +113,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can impersonate an other user.
+     * Return true or false if the user can impersonate another user.
      *
-     * @param void
      * @return bool
      */
     public function canImpersonate(): bool
@@ -120,9 +123,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Return true or false if the user can be impersonate.
+     * Return true or false if the user can be impersonated.
      *
-     * @param void
      * @return bool
      */
     public function canBeImpersonated(): bool
