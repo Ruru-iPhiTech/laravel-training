@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\LocaleController;
+use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
+use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
 
 /*
  * Global Routes
@@ -14,7 +16,7 @@ Route::get('lang/{lang}', [LocaleController::class, 'change'])->name('locale.cha
 /*
  * Frontend Routes
  */
-Route::group(['as' => 'admin.'], function () {
+Route::group(['as' => 'frontend.'], function () {
     includeRouteFiles(__DIR__.'/frontend/');
 });
 
@@ -26,3 +28,11 @@ Route::group(['as' => 'admin.'], function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'admin'], function () {
     includeRouteFiles(__DIR__.'/backend/');
 });
+
+
+Route::get('/admin/users', [UserController::class, 'index'])->name('admin.auth.user.index');
+Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.auth.role.index');
+
+// User routes
+Route::get('/admin/users/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
+Route::patch('/admin/auth/user/{user}/restore', [DeletedUserController::class, 'restore'])->name('admin.auth.user.restore');
