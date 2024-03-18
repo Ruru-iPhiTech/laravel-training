@@ -2,12 +2,13 @@
 
 namespace App\Domains\Auth\Services;
 
+use App\Domains\Auth\Models\Permission;;
 use App\Services\BaseService;
 
 /**
  * Class PermissionService.
  */
-class PermissionServices extends BaseService
+class PermissionService extends BaseService
 {
     /**
      * PermissionService constructor.
