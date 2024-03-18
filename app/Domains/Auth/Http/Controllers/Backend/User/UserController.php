@@ -45,6 +45,34 @@ class UserController
         $this->permissionService = $permissionService;
     }
 
+/**
+ * Display the form for creating a new user.
+ *
+ * @return \Illuminate\View\View
+ */
+public function create()
+{
+    $roles = $this->roleService->get(); // Assuming get() method returns roles
+    $general = $this->permissionService->getUncategorizedPermissions();
+    $categories = $this->permissionService->getCategorizedPermissions();
+
+    return view('backend.auth.user.create', compact('roles', 'general', 'categories'));
+}
+
+
+    /**
+     * Store a newly created user in storage.
+     *
+     * @param  StoreUserRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(StoreUserRequest $request)
+    {
+        $this->userService->create($request->validated());
+
+        return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully created.'));
+    }
+
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -52,6 +80,28 @@ class UserController
     {
         return view('backend.auth.user.index');
     }
+
+    public function edit(EditUserRequest $request, User $user)
+{
+    return view('backend.auth.user.edit')
+        ->withUser($user)
+        ->withRoles($this->roleService->get())
+        ->withCategories($this->permissionService->getCategorizedPermissions())
+        ->withGeneral($this->permissionService->getUncategorizedPermissions())
+        ->withUsedPermissions($user->permissions->modelKeys());
+}
+
+public function update(UpdateUserRequest $request, User $user)
+{
+    $this->userService->update($user, $request->validated());
+
+    return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
+}
+
+public function show(User $user)
+{
+    return view('backend.auth.user.show')->withUser($user);
+}
 
     // Other methods...
 
