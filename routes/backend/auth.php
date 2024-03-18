@@ -17,6 +17,7 @@ Route::group([
     'as' => 'admin.auth.',
     'middleware' => config('boilerplate.access.middleware.confirm'),
 ], function () {
+    // User Routes
     Route::group([
         'prefix' => 'user',
         'as' => 'user.',
@@ -24,7 +25,7 @@ Route::group([
         Route::group([
             'middleware' => 'role:'.config('boilerplate.access.role.admin'),
         ], function () {
-            Route::put('deleted', [DeletedUserController::class, 'index'])
+            Route::get('deleted', [DeletedUserController::class, 'index'])
                 ->name('deleted')
                 ->breadcrumbs(function (Trail $trail) {
                     $trail->parent('admin.auth.user.index')
@@ -58,6 +59,7 @@ Route::group([
             });
         });
 
+        // Admin Routes
         Route::group([
             'middleware' => 'permission:admin.access.user.list|admin.access.user.deactivate|admin.access.user.reactivate|admin.access.user.clear-session|admin.access.user.impersonate|admin.access.user.change-password',
         ], function () {
