@@ -50,7 +50,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/{user}/change-password', [UserController::class, 'changePassword'])->name('admin.auth.user.change-password');
         Route::get('/clear-session', [UserController::class, 'clearSession'])->name('admin.auth.user.clear-session');
         Route::post('/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
-        
     });
 
     // Admin roles
