@@ -43,7 +43,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/', [UserController::class, 'store'])->name('admin.auth.user.store');
         Route::get('/{user}', [UserController::class, 'show'])->name('admin.auth.user.show');
         Route::get('/{user}/edit', [UserController::class, 'edit'])->name('admin.auth.user.edit');
-        Route::put('/{user}', [UserController::class, 'update'])->name('admin.auth.user.update');
+        Route::patch('/{user}', [UserController::class, 'update'])->name('admin.auth.user.update');
         Route::get('/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('admin.auth.user.destroy');
         Route::get('/deactivated', [UserController::class, 'deactivated'])->name('admin.auth.user.deactivated');
