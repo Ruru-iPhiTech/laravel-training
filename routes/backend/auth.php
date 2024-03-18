@@ -139,7 +139,7 @@ Route::group([
                         ->push(__('Editing :role', ['role' => $role->name]), route('admin.auth.role.edit', $role));
                 });
 
-            Route::patch('/', [RoleController::class, 'update'])->name('update');
+            Route::put('/', [RoleController::class, 'update'])->name('update');
             Route::delete('/', [RoleController::class, 'destroy'])->name('destroy');
         });
     });
