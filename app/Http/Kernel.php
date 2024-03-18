@@ -87,6 +87,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'type' => \App\Domains\Auth\Http\Middleware\UserTypeCheck::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'admin.access.user.change-password' => \App\Http\Middleware\AdminAccessUserChangePasswordMiddleware::class,
     ];
 
     /**
