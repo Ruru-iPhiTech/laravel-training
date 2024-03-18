@@ -2,6 +2,7 @@
 
 namespace App\Domains\Auth\Services;
 
+
 use App\Domains\Auth\Events\Role\RoleCreated;
 use App\Domains\Auth\Events\Role\RoleDeleted;
 use App\Domains\Auth\Events\Role\RoleUpdated;
@@ -90,15 +91,15 @@ class RoleService extends BaseService
     public function destroy(Role $role): bool
     {
         if ($role->users()->count()) {
-            throw new GeneralException(__('You can not delete a role with associated users.'));
+            throw new GeneralException(__('You cannot delete a role with associated users.'));
         }
 
-        if ($this->deleteById($role->id)) {
+        try {
+            $role->delete();
             event(new RoleDeleted($role));
-
             return true;
+        } catch (Exception $e) {
+            throw new GeneralException(__('There was a problem deleting the role.'));
         }
-
-        throw new GeneralException(__('There was a problem deleting the role.'));
     }
 }
