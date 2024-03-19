@@ -6,7 +6,9 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
 use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
 use App\Domains\Auth\Http\Controllers\Backend\User\DeactivatedUserController;
-
+use App\Domains\Auth\Http\Controllers\Backend\User\DeletedUserController;
+use App\Domains\Auth\Http\Controllers\Backend\User\UserPasswordController;
+use App\Domains\Auth\Http\Controllers\Backend\User\UserSessionController;
 
 /*
  * Global Routes
@@ -35,36 +37,32 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'admin'], f
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-
-
-Route::prefix('admin')->group(function () {
+Route::prefix('admin/auth')->middleware('auth')->group(function () {
     // User management
-    Route::prefix('/users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('admin.auth.user.index');
-        Route::get('/create', [UserController::class, 'create'])->name('admin.auth.user.create');
-        Route::post('/', [UserController::class, 'store'])->name('admin.auth.user.store');
-        Route::get('/{user}', [UserController::class, 'show'])->name('admin.auth.user.show');
-        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('admin.auth.user.edit');
-        Route::patch('/{user}', [UserController::class, 'update'])->name('admin.auth.user.update');
-        Route::get('/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('admin.auth.user.destroy');
-        Route::get('/deactivated', [UserController::class, 'deactivated'])->name('admin.auth.user.deactivated');
-        Route::post('/{user}/deactivate', [DeactivatedUserController::class, 'update'])
-            ->name('admin.auth.user.deactivate');
-        Route::get('/{user}/change-password', [UserController::class, 'changePassword'])->name('admin.auth.user.change-password');
-        Route::get('/clear-session', [UserController::class, 'clearSession'])->name('admin.auth.user.clear-session');
-        // Route::post('/{user}/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
-        Route::post('/{user?}/mark/{status?}', [UserController::class, 'mark'])->name('admin.auth.user.mark')->where(['status' => '[0,1]']);
+    Route::prefix('user')->name('admin.auth.user.')->group(function () {
+        Route::get('deleted', [DeletedUserController::class, 'index'])->name('deleted');
+        Route::get('create', [UserController::class, 'create'])->name('create');
+        Route::post('store', [UserController::class, 'store'])->name('store');
+        Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::patch('{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
+        Route::patch('{deletedUser}/restore', [DeletedUserController::class, 'update'])->name('restore');
+        Route::delete('{deletedUser}/permanently-delete', [DeletedUserController::class, 'destroy'])->name('permanently-delete');
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('{user}', [UserController::class, 'show'])->name('show');
+        Route::post('{user}/mark/{status}', [DeactivatedUserController::class, 'update'])->name('mark')->where(['status' => '[0,1]']);
+        Route::post('{user}/clear-session', [UserSessionController::class, 'update'])->name('clear-session');
+        Route::get('{user}/change-password', [UserPasswordController::class, 'edit'])->name('change-password');
+        Route::patch('{user}/change-password', [UserPasswordController::class, 'update'])->name('change-password.update');
+        Route::get('deactivated', [DeactivatedUserController::class, 'index'])->name('deactivated');
     });
-
     // Role management
-    Route::prefix('/roles')->group(function () {
-        Route::get('/', [RoleController::class, 'index'])->name('admin.auth.role.index');
-        Route::get('/create', [RoleController::class, 'create'])->name('admin.auth.role.create');
-        Route::post('/store', [RoleController::class, 'store'])->name('admin.auth.role.store');
-        Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('admin.auth.role.edit');
-        Route::put('/{role}', [RoleController::class, 'update'])->name('admin.auth.role.update');
-        Route::delete('/{role}', [RoleController::class, 'destroy'])->name('admin.auth.role.destroy');
+    Route::prefix('role')->name('admin.auth.role.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('create', [RoleController::class, 'create'])->name('create');
+        Route::post('store', [RoleController::class, 'store'])->name('store');
+        Route::get('{role}/edit', [RoleController::class, 'edit'])->name('edit');
+        Route::put('{role}', [RoleController::class, 'update'])->name('update');
+        Route::delete('{role}', [RoleController::class, 'destroy'])->name('destroy');
     });
 });
-
