@@ -302,7 +302,7 @@ class UserService extends BaseService
             throw new GeneralException(__('You can not delete yourself.'));
         }
 
-        if ($this->deleteById($user->id)) {
+        if ($user->delete()) {
             event(new UserDeleted($user));
 
             return $user;
@@ -336,6 +336,10 @@ class UserService extends BaseService
      */
     public function destroy(User $user): bool
     {
+        if ($user->id === auth()->id()) {
+            throw new GeneralException(__('You cannot delete yourself.'));
+        }
+
         if ($user->forceDelete()) {
             event(new UserDestroyed($user));
 
