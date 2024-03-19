@@ -137,17 +137,16 @@ class UserController
     }
 
     /**
-     * @param  DeleteUserRequest  $request
      * Deactivate the specified user.
      *
      * @param  User  $user
-     * @param  DeactivatedUserController  $deactivatedUserController
      * @return mixed
      */
-    public function deactivate(User $user, DeactivatedUserController $deactivatedUserController)
+    public function deactivate(User $user)
     {
         try {
-            return $deactivatedUserController->update(request(), $user, 0);
+            $this->userService->mark($user, 0);
+            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully deactivated.'));
         } catch (\Exception $e) {
             \Log::error('Error deactivating user: ' . $e->getMessage());
             return redirect()->back()->withErrors(__('There was a problem deactivating this user. Please try again.'));
@@ -157,17 +156,36 @@ class UserController
     /**
      * Delete the specified user.
      *
-     * @throws \App\Exceptions\GeneralException
      * @param DeleteUserRequest $request
      * @param User $user
      * @return mixed
      */
     public function destroy(DeleteUserRequest $request, User $user)
     {
-        abort_unless(config('boilerplate.access.user.permanently_delete'), 404);
+        try {
+            $user->delete();
+            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully deleted.'));
+        } catch (\Exception $e) {
+            \Log::error('Error soft deleting user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem soft deleting this user. Please try again.'));
+        }
+    }
 
-        $this->userService->destroy($user);
-
-        return redirect()->route('admin.auth.user.deleted')->withFlashSuccess(__('The user was successfully deleted.'));
+    /**
+     * Permanently delete the specified user.
+     *
+     * @param DeleteUserRequest $request
+     * @param User $user
+     * @return mixed
+     */
+    public function permanentlyDelete(DeleteUserRequest $request, User $user)
+    {
+        try {
+            $this->userService->destroy($user);
+            return redirect()->route('admin.auth.user.deleted')->withFlashSuccess(__('The user was permanently deleted.'));
+        } catch (\Exception $e) {
+            \Log::error('Error permanently deleting user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem permanently deleting this user. Please try again.'));
+        }
     }
 }
