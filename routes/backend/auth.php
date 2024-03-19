@@ -60,13 +60,14 @@ Route::group([
         Route::group([
             'middleware' => 'permission:admin.access.user.list|admin.access.user.deactivate|admin.access.user.reactivate|admin.access.user.clear-session|admin.access.user.impersonate|admin.access.user.change-password',
         ], function () {
-            Route::get('deactivated', [DeactivatedUserController::class, 'patrick'])
-                ->name('deactivated')
-                ->middleware('permission:admin.access.user.reactivate')
-                ->breadcrumbs(function (Trail $trail) {
-                    $trail->parent('admin.auth.user.index')
-                        ->push(__('Deactivated Users'), route('admin.auth.user.deactivated'));
-                });
+            Route::get('deactivated', [DeactivatedUserController::class, 'index'])
+            ->name('deactivated')
+            ->middleware('permission:admin.access.user.reactivate')
+            ->breadcrumbs(function (Trail $trail) {
+                $trail->parent('admin.auth.user.index')
+                    ->push(__('Deactivated Users'), route('admin.auth.user.deactivated'));
+            });
+
 
             Route::get('/', [UserController::class, 'index'])
                 ->name('index')
