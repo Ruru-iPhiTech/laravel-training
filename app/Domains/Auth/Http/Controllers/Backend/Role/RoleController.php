@@ -105,10 +105,11 @@ class RoleController
      *
      * @throws \Exception
      */
-    public function destroy(DeleteRoleRequest $request, Role $role)
+    public function destroy(Role $role)
     {
         $this->roleService->destroy($role);
-
+    
         return redirect()->route('admin.auth.role.index')->withFlashSuccess(__('The role was successfully deleted.'));
     }
+    
 }
