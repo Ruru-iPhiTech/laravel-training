@@ -3,6 +3,8 @@
 use App\Http\Controllers\LocaleController;
 use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
 use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
+use App\Domains\Auth\Http\Controllers\Backend\User\DeletedUserController;
+
 
 /*
  * Global Routes
@@ -27,6 +29,7 @@ Route::group(['as' => 'frontend.'], function () {
  */
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'admin'], function () {
     includeRouteFiles(__DIR__.'/backend/');
+    
 });
 
 
@@ -36,3 +39,13 @@ Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.auth.r
 // User routes
 Route::get('/admin/users/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
 Route::patch('/admin/auth/user/{user}/restore', [DeletedUserController::class, 'restore'])->name('admin.auth.user.restore');
+
+Route::prefix('admin')->middleware('admin')->group(function () {
+    Route::get('/roles', [RoleController::class, 'index'])->name('admin.auth.role.index');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('admin.auth.role.create');
+    Route::post('/roles', [RoleController::class, 'store'])->name('admin.auth.role.store');
+    Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('admin.auth.role.edit');
+    Route::patch('/roles/{role}', [RoleController::class, 'update'])->name('admin.auth.role.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('admin.auth.role.destroy');
+
+});
