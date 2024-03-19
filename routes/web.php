@@ -50,11 +50,13 @@ Route::prefix('admin/auth')->middleware('auth')->group(function () {
         Route::delete('{deletedUser}/permanently-delete', [DeletedUserController::class, 'destroy'])->name('permanently-delete');
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('{user}', [UserController::class, 'show'])->name('show');
+        Route::get('deactivated', [UserController::class, 'index'])->name('deactivated');
+        Route::post('{user}/deactivate', [UserController::class, 'deactivate'])->name('deactivate');
+        Route::post('{user}/reactivate', [UserController::class, 'reactivate'])->name('reactivate');
         Route::post('{user}/mark/{status}', [DeactivatedUserController::class, 'update'])->name('mark')->where(['status' => '[0,1]']);
         Route::post('{user}/clear-session', [UserSessionController::class, 'update'])->name('clear-session');
         Route::get('{user}/change-password', [UserPasswordController::class, 'edit'])->name('change-password');
         Route::patch('{user}/change-password', [UserPasswordController::class, 'update'])->name('change-password.update');
-        Route::get('deactivated', [DeactivatedUserController::class, 'index'])->name('deactivated');
     });
     // Role management
     Route::prefix('role')->name('admin.auth.role.')->group(function () {
