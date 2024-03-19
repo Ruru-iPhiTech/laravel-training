@@ -154,6 +154,23 @@ class UserController
     }
 
     /**
+     * Reactivate the specified user.
+     *
+     * @param  User  $user
+     * @return mixed
+     */
+    public function reactivate(User $user)
+    {
+        try {
+            $this->userService->mark($user, 1);
+            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully reactivated.'));
+        } catch (\Exception $e) {
+            \Log::error('Error reactivating user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem reactivating this user. Please try again.'));
+        }
+    }
+
+    /**
      * Delete the specified user.
      *
      * @param DeleteUserRequest $request
