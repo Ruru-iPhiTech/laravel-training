@@ -10,11 +10,12 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
 use App\Domains\Auth\Services\UserService;
+use Illuminate\Support\Facades\View;
 
 /**
  * Class UserController.
  */
-class UserConttroller
+class UserController
 {
     /**
      * @var UserService
@@ -38,11 +39,11 @@ class UserConttroller
  
      * @param  PermissionService  $permissionService
      */
-    public function __construct(UserService $userService,   PermissionService $permissionService)
+    public function __construct(UserService $userService, PermissionService $permissionService, RoleService $roleService)
     {
         $this->userService = $userService;
-
         $this->permissionService = $permissionService;
+        $this->roleService = $roleService;
     }
 
     /**
@@ -65,8 +66,8 @@ class UserConttroller
     }
 
     /**
-     * @param  StoreUserRequest  $request
-     * @return mixed
+     * @param  UpdateUserRequest  $request
+     * @param  User  $user
      *
      * @throws \App\Exceptions\GeneralException
      * @throws \Throwable
@@ -104,7 +105,7 @@ class UserConttroller
     }
 
     /**
-     * @param  UpdateUserRequest  $request
+    * @param  UpdateUserRequest  $request
      * @param  User  $user
      * @return mixed
      *
@@ -112,6 +113,8 @@ class UserConttroller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+        $this->userService->update($user, $request->validated());
+        
         return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
     }
 
@@ -128,4 +131,29 @@ class UserConttroller
 
         return redirect()->route('admin.auth.user.deleted')->withFlashSuccess(__('The user was successfully deleted.'));
     }
+    /**
+     * Get the deactivated users.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function deactivated()
+    {
+        $deactivatedUsers = User::whereNotNull('deleted_at')->get();
+
+        return view('backend.auth.user.deactivated', compact('deactivatedUsers'));
+    }
+
+    /**
+     * Get the deleted users.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function deletedusers()
+    {
+        $deletedUsers = User::onlyTrashed()->get();
+
+        return view('backend.auth.user.deleted', compact('deletedUsers'));
+    }
+
 }
+
