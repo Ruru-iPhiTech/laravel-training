@@ -17,11 +17,11 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->enum('type', [User::TYPE_ADMIN, User::TYPE_USER])->default(User::TYPE_USER);
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->timestamp('password_changed_at');
+            $table->string('name')->nullable();    
+            $table->string('email')->unique()->nullable();
+            $table->timestamp('email_verified_at')->default(now());
+            $table->string('password')->nullable();
+            $table->timestamp('password_changed_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->unsignedTinyInteger('active')->default(1);
             $table->string('timezone')->nullable();
             $table->timestamp('last_login_at')->nullable();
