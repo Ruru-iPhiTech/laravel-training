@@ -14,7 +14,6 @@ use Database\Factories\UserFactory;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -43,6 +42,8 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     public const TYPE_ADMIN = 'admin';
     public const TYPE_USER = 'user';
 
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -52,7 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         'type',
         'name',
         'email',
-        'last_login_at',
+        'password',
     ];
 
     /**
@@ -74,6 +75,10 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         'last_login_at',
         'email_verified_at',
         'password_changed_at',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
     ];
 
     /**
@@ -109,8 +114,6 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
 
     /**
      * Send the registration verification email.
-     *
-     * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
@@ -119,7 +122,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
 
     /**
      * Return true or false if the user can impersonate another user.
-     * @param void
+     *
      * @return bool
      */
     public function canImpersonate(): bool
@@ -130,12 +133,11 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     /**
      * Return true or false if the user can be impersonated.
      *
-     * @param void
      * @return bool
      */
     public function canBeImpersonated(): bool
     {
-        return ! $this->isMasterAdmin();
+        return !$this->isMasterAdmin();
     }
 
     /**
@@ -149,24 +151,11 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Get the two-factor authentication record associated with the user.
+     * Retrieve the recovery codes for the user.
+     *
+     * @return mixed
      */
-    public function laraguard(): MorphOne
+    public function recoveryCodes()
     {
-        return $this->morphOne(TwoFactorAuthentication::class, 'authenticatable');
-    }
-
-    /**
-     * Disable two-factor authentication for the user.
-     */
-    public function disableTwoFactorAuth(): void
-    {
-        // Retrieve the associated TwoFactorAuthentication record
-        $laraguard = $this->laraguard()->first();
-
-        // If a TwoFactorAuthentication record exists, delete it
-        if ($laraguard !== null) {
-            $laraguard->delete();
-        }
     }
 }
