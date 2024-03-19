@@ -93,9 +93,13 @@ class RoleController
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        $this->roleService->update($role, $request->validated());
-
-        return redirect()->route('admin.auth.role.index')->withFlashSuccess(__('The role was successfully updated.'));
+        try {
+            $updatedRole = $this->roleService->update($role, $request->validated());
+            return redirect()->route('admin.auth.role.index', $updatedRole)->withFlashSuccess(__('The role was successfully updated.'));
+        } catch (\Exception $e) {
+            \Log::error('Error updating role: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(__('There was a problem updating this role. Please try again.'));
+        }
     }
 
     /**
