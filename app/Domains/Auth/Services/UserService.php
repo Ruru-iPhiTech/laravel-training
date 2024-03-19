@@ -2,6 +2,7 @@
 
 namespace App\Domains\Auth\Services;
 
+
 use App\Domains\Auth\Events\User\UserCreated;
 use App\Domains\Auth\Events\User\UserDeleted;
 use App\Domains\Auth\Events\User\UserDestroyed;
@@ -28,6 +29,33 @@ class UserService extends BaseService
     public function __construct(User $user)
     {
         $this->model = $user;
+    }
+
+    /**
+     * Create a user from an array of data.
+     *
+     * @param  array  $data
+     * @return User
+     * @throws Exception
+     */
+    public function createFromArray(array $data): User
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = $this->createUser([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception('Failed to create user: ' . $e->getMessage());
+        }
+
+        return $user;
     }
 
     /**
@@ -78,7 +106,7 @@ class UserService extends BaseService
     {
         $user = $this->model::where('provider_id', $info->id)->first();
 
-        if (! $user) {
+        if (!$user) {
             DB::beginTransaction();
 
             try {
@@ -118,13 +146,13 @@ class UserService extends BaseService
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $data['password'],
-                'email_verified_at' => isset($data['email_verified']) && $data['email_verified'] === '1' ? now() : null,
-                'active' => isset($data['active']) && $data['active'] === '1',
+                'email_verified_at' => isset ($data['email_verified']) && $data['email_verified'] === '1' ? now() : null,
+                'active' => isset ($data['active']) && $data['active'] === '1',
             ]);
 
             $user->syncRoles($data['roles'] ?? []);
 
-            if (! config('boilerplate.access.user.only_roles')) {
+            if (!config('boilerplate.access.user.only_roles')) {
                 $user->syncPermissions($data['permissions'] ?? []);
             }
         } catch (Exception $e) {
@@ -138,7 +166,7 @@ class UserService extends BaseService
         DB::commit();
 
         // They didn't want to auto verify the email, but do they want to send the confirmation email to do so?
-        if (! isset($data['email_verified']) && isset($data['send_confirmation_email']) && $data['send_confirmation_email'] === '1') {
+        if (!isset ($data['email_verified']) && isset ($data['send_confirmation_email']) && $data['send_confirmation_email'] === '1') {
             $user->sendEmailVerificationNotification();
         }
 
@@ -157,17 +185,21 @@ class UserService extends BaseService
         DB::beginTransaction();
 
         try {
-            $user->update([
-                'type' => $user->isMasterAdmin() ? $this->model::TYPE_ADMIN : $data['type'] ?? $user->type,
+            $userData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
-            ]);
+            ];
 
-            if (! $user->isMasterAdmin()) {
-                // Replace selected roles/permissions
+            if (isset ($data['type'])) {
+                $userData['type'] = $data['type'];
+            }
+
+            $user->update($userData);
+
+            if (!$user->isMasterAdmin()) {
                 $user->syncRoles($data['roles'] ?? []);
 
-                if (! config('boilerplate.access.user.only_roles')) {
+                if (!config('boilerplate.access.user.only_roles')) {
                     $user->syncPermissions($data['permissions'] ?? []);
                 }
             }
@@ -213,9 +245,9 @@ class UserService extends BaseService
      */
     public function updatePassword(User $user, $data, $expired = false): User
     {
-        if (isset($data['current_password'])) {
+        if (isset ($data['current_password'])) {
             throw_if(
-                ! Hash::check($data['current_password'], $user->password),
+                !Hash::check($data['current_password'], $user->password),
                 new GeneralException(__('That is not your old password.'))
             );
         }
