@@ -22,7 +22,7 @@ class Role extends SpatieRole
     /**
      * @var string[]
      */
-  
+
 
     /**
      * Create a new factory instance for the model.
