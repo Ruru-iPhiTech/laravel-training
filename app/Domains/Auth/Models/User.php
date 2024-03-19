@@ -20,6 +20,13 @@ use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Str;
+use BaconQrCode\Writer;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\Image\PngImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use App\Domains\Auth\Models\User;
 
 /**
  * Class User.
@@ -42,12 +49,92 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     public const TYPE_ADMIN = 'admin';
     public const TYPE_USER = 'user';
 
+
+    /**
+     * Create a new instance of the User model with two-factor authentication enabled.
+     *
+     * @param  array  $attributes
+     * @return static
+     */
+    public static function createTwoFactorAuth2(array $attributes = [])
+    {
+        $attributes['two_factor_secret'] = static::generateTwoFactorSecret();
+        $attributes['two_factor_recovery_codes'] = static::generateTwoFactorRecoveryCodes();
+
+        return static::create($attributes);
+    }
+     /**
+     * Generate a new two-factor authentication secret.
+     *
+     * @return string
+     */
+    public static function generateTwoFactorSecret()
+    {
+        return \Illuminate\Support\Str::random(64); 
+    }
+
+      /**
+     * Generate recovery codes for two-factor authentication.
+     *
+     * @return array
+     */
+    public static function generateTwoFactorRecoveryCodes()
+    {
+        $codes = [];
+
+        for ($i = 0; $i < 6; $i++) {
+            $codes[] = Str::random(8);
+        }
+
+        return $codes;
+    }
+public function toQr()
+{
+    if (!empty($this->email)) {
+        $uri = sprintf(
+            'otpauth://totp/%s:%s?secret=%s&issuer=%s',
+            urlencode(config('app.name')),
+            urlencode($this->email),
+            urlencode($this->two_factor_secret),
+            urlencode(config('app.name'))
+        );
+
+        // Create a renderer style
+        $rendererStyle = new RendererStyle(400);
+
+        // Create an image renderer with the SVG image backend
+        $renderer = new ImageRenderer(
+            $rendererStyle,
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+        return $writer->writeString($uri);
+    } else {
+        return null; // Or handle the case when email is null or empty
+    }
+}
+    /**
+     * Check if two-factor authentication is enabled for the user.
+     *
+     * @return bool
+     */
+    public function hasTwoFactorAuthenticationEnabled()
+    {
+        return !empty($this->two_factor_secret);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-  
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'last_login_at', 
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
