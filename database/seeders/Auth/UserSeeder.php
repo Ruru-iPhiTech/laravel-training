@@ -25,7 +25,6 @@ class UserSeeder extends Seeder
             'type' => User::TYPE_ADMIN,
             'name' => 'Super Admin',
             'email' => 'admin@admin.com',
-            'confirm_password' => 'admin',
             'password' => 'secret',
             'email_verified_at' => now(),
             'active' => true,
