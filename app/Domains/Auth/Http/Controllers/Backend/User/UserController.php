@@ -2,7 +2,6 @@
 
 namespace App\Domains\Auth\Http\Controllers\Backend\User;
 
-use Illuminate\Http\Request;
 use App\Domains\Auth\Http\Requests\Backend\User\DeleteUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\EditUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\StoreUserRequest;
@@ -11,6 +10,7 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
 use App\Domains\Auth\Services\UserService;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserController.
@@ -74,9 +74,22 @@ class UserController
      */
     public function store(StoreUserRequest $request)
     {
-        $user = $this->userService->store($request->validated());
+        try {
+            $user = $this->userService->createFromArray($request->validated());
+            return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully created.'));
+        } catch (\Exception $e) {
+            \Log::error('Error creating user: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(__('There was a problem creating this user. Please try again.'));
+        }
+    }
 
-        return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully created.'));
+    public function createFromArray(array $data): User
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
     }
 
     /**
@@ -113,7 +126,13 @@ class UserController
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully updated.'));
+        try {
+            $updatedUser = $this->userService->update($user, $request->validated());
+            return redirect()->route('admin.auth.user.show', $updatedUser)->withFlashSuccess(__('The user was successfully updated.'));
+        } catch (\Exception $e) {
+            \Log::error('Error updating user: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(__('There was a problem updating this user. Please try again.'));
+        }
     }
 
     /**
