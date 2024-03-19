@@ -86,6 +86,7 @@ class UserController
     public function createFromArray(array $data): User
     {
         return User::create([
+            'type' => $data['type'],
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -137,14 +138,35 @@ class UserController
 
     /**
      * @param  DeleteUserRequest  $request
+     * Deactivate the specified user.
+     *
      * @param  User  $user
+     * @param  DeactivatedUserController  $deactivatedUserController
      * @return mixed
+     */
+    public function deactivate(User $user, DeactivatedUserController $deactivatedUserController)
+    {
+        try {
+            return $deactivatedUserController->update(request(), $user, 0);
+        } catch (\Exception $e) {
+            \Log::error('Error deactivating user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem deactivating this user. Please try again.'));
+        }
+    }
+
+    /**
+     * Delete the specified user.
      *
      * @throws \App\Exceptions\GeneralException
+     * @param DeleteUserRequest $request
+     * @param User $user
+     * @return mixed
      */
     public function destroy(DeleteUserRequest $request, User $user)
     {
-        $this->userService->delete($user);
+        abort_unless(config('boilerplate.access.user.permanently_delete'), 404);
+
+        $this->userService->destroy($user);
 
         return redirect()->route('admin.auth.user.deleted')->withFlashSuccess(__('The user was successfully deleted.'));
     }
