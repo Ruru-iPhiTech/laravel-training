@@ -17,7 +17,7 @@ class CreateTwoFactorAuthenticationsTable extends Migration
             $table->bigIncrements('id');
             $table->morphs('authenticatable', '2fa_auth_type_auth_id_index');
             $table->string('shared_secret')->nullable();
-            $table->timestampTz('enabled_at')->default(now());
+            $table->timestampTz('enabled_at')->nullable()->default(now());
             $table->string('label')->unique();
             $table->unsignedTinyInteger('digits')->default(6);
             $table->unsignedTinyInteger('seconds')->default(30);
