@@ -88,7 +88,7 @@ Route::group([
                             ->push($user->name, route('admin.auth.user.show', $user));
                     });
 
-                Route::patch('mark/{status}', [DeactivatedUserController::class, 'update'])
+                Route::post('mark/{status}', [DeactivatedUserController::class, 'update'])
                     ->name('mark')
                     ->where(['status' => '[0,1]'])
                     ->middleware('permission:admin.access.user.deactivate|admin.access.user.reactivate');
