@@ -31,7 +31,8 @@ class AuthSeeder extends Seeder
 
         $this->truncateMultiple([
 
-            config('permission.table_names.model_has_permissions'),            config('permission.table_names.model_has_roles'),
+            config('permission.table_names.model_has_permissions'),
+            config('permission.table_names.model_has_roles'),
             config('permission.table_names.role_has_permissions'),
             config('permission.table_names.permissions'),
 
