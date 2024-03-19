@@ -17,7 +17,7 @@ class CreatePasswordHistoriesTable extends Migration
             $table->id();
             $table->string('model_type');
             $table->unsignedBigInteger('model_id');
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->timestamps();
         });
     }
