@@ -13,6 +13,8 @@ use App\Http\Controllers\Frontend\User\AccountController;
 use App\Http\Controllers\Frontend\User\ProfileController;
 use App\Http\Controllers\Frontend\User\DashboardController as FrontendDashboardController;
 use App\Domains\Auth\Http\Controllers\Backend\User\DeletedUserController;
+use App\Domains\Auth\Http\Controllers\Backend\User\DeactivatedUserController;
+
 /*
  * Global Routes
  *
@@ -52,7 +54,13 @@ Route::post('/auth/account/2fa/validate-code', [TwoFactorAuthenticationControlle
     Route::get('/users/{user}/change-password', [UserController::class, 'changePassword'])->name('admin.auth.user.change-password');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.auth.user.destroy');
     Route::get('/users/clear-session', [UserController::class, 'clearSession'])->name('admin.auth.user.clear-session');
-    Route::post('/users/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
+    Route::patch('/users/mark/{user}/{status}', [DeactivatedUserController::class, 'update'])
+    ->name('admin.auth.user.mark')
+    ->where(['status' => '[0,1]'])
+    ->middleware('permission:admin.access.user.deactivate|admin.access.user.reactivate');
+    Route::patch('/users/restore/{deletedUser}', [DeletedUserController::class, 'update'])
+    ->name('admin.auth.user.restore');
+
     Route::patch('/users/{user}', [UserController::class, 'update'])->name('admin.auth.user.update');
     Route::post('/users', [UserController::class, 'store'])->name('admin.auth.user.store');
     Route::post('/users/{user}/impersonate', [ImpersonateController::class, 'take'])->name('admin.auth.user.impersonate');
