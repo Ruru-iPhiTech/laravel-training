@@ -5,6 +5,8 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
 use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
+use App\Domains\Auth\Http\Controllers\Backend\User\DeactivatedUserController;
+
 
 /*
  * Global Routes
@@ -36,7 +38,7 @@ Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('adm
 
 
 Route::prefix('admin')->group(function () {
-    // User roles
+    // User management
     Route::prefix('/users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('admin.auth.user.index');
         Route::get('/create', [UserController::class, 'create'])->name('admin.auth.user.create');
@@ -47,12 +49,15 @@ Route::prefix('admin')->group(function () {
         Route::get('/deleted', [UserController::class, 'deleted'])->name('admin.auth.user.deleted');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('admin.auth.user.destroy');
         Route::get('/deactivated', [UserController::class, 'deactivated'])->name('admin.auth.user.deactivated');
+        Route::post('/{user}/deactivate', [DeactivatedUserController::class, 'update'])
+            ->name('admin.auth.user.deactivate');
         Route::get('/{user}/change-password', [UserController::class, 'changePassword'])->name('admin.auth.user.change-password');
         Route::get('/clear-session', [UserController::class, 'clearSession'])->name('admin.auth.user.clear-session');
-        Route::post('/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
+        // Route::post('/{user}/mark', [UserController::class, 'mark'])->name('admin.auth.user.mark');
+        Route::post('/{user?}/mark/{status?}', [UserController::class, 'mark'])->name('admin.auth.user.mark')->where(['status' => '[0,1]']);
     });
 
-    // Admin roles
+    // Role management
     Route::prefix('/roles')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('admin.auth.role.index');
         Route::get('/create', [RoleController::class, 'create'])->name('admin.auth.role.create');
