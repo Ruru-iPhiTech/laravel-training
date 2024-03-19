@@ -38,7 +38,11 @@ class RoleService extends BaseService
         DB::beginTransaction();
 
         try {
-            $role = $this->model::create(['type' => $data['type'], 'name' => $data['name']]);
+            $role = $this->model::create([
+                'type' => $data['type'],
+                'name' => $data['name']
+            ]);
+
             $role->syncPermissions($data['permissions'] ?? []);
         } catch (Exception $e) {
             DB::rollBack();
@@ -46,9 +50,9 @@ class RoleService extends BaseService
             throw new GeneralException(__('There was a problem creating the role.'));
         }
 
-        event(new RoleCreated($role));
-
         DB::commit();
+
+        event(new RoleCreated($role));
 
         return $role;
     }
@@ -66,7 +70,11 @@ class RoleService extends BaseService
         DB::beginTransaction();
 
         try {
-            $role->update(['type' => $data['type'], 'name' => $data['name']]);
+            $role->update([
+                'type' => $data['type'],
+                'name' => $data['name']
+            ]);
+
             $role->syncPermissions($data['permissions'] ?? []);
         } catch (Exception $e) {
             DB::rollBack();
@@ -74,9 +82,9 @@ class RoleService extends BaseService
             throw new GeneralException(__('There was a problem updating the role.'));
         }
 
-        event(new RoleUpdated($role));
-
         DB::commit();
+
+        event(new RoleUpdated($role));
 
         return $role;
     }
@@ -89,16 +97,25 @@ class RoleService extends BaseService
      */
     public function destroy(Role $role): bool
     {
-        if ($role->users()->count()) {
-            throw new GeneralException(__('You can not delete a role with associated users.'));
+        if ($role->users()->count() > 0) {
+            throw new GeneralException(__('You cannot delete a role with associated users.'));
         }
 
-        if ($this->deleteById($role->id)) {
-            event(new RoleDeleted($role));
+        DB::beginTransaction();
 
-            return true;
+        try {
+            $role->permissions()->detach();
+            $role->delete();
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            throw new GeneralException(__('There was a problem deleting the role.'));
         }
 
-        throw new GeneralException(__('There was a problem deleting the role.'));
+        DB::commit();
+
+        event(new RoleDeleted($role));
+
+        return true;
     }
 }
