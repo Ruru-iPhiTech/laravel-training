@@ -5,6 +5,7 @@ use App\Domains\Auth\Http\Controllers\Backend\User\UserController;
 use App\Domains\Auth\Http\Controllers\Backend\Role\RoleController;
 use App\Domains\Auth\Http\Controllers\Backend\User\UserPasswordController;
 use App\Domains\Auth\Http\Controllers\Backend\User\UserSessionController;
+use App\Domains\Auth\Http\Controllers\Frontend\Auth\TwoFactorAuthenticationController;
 
 /*
  * Backend Access Controllers
@@ -44,4 +45,12 @@ Route::group([
         Route::get('user/{user}', [UserController::class, 'show'])->name('user.show');
         Route::post('user/{user}/mark/{status}', [UserController::class, 'mark'])->name('user.mark');
     });
+});
+
+Route::group([
+    'prefix' => 'account',
+    'as' => 'account.',
+    'middleware' => config('boilerplate.access.middleware.confirm'),
+], function () {
+    Route::post('2fa/disable', [TwoFactorAuthenticationController::class, 'disable'])->name('2fa.disable');
 });
