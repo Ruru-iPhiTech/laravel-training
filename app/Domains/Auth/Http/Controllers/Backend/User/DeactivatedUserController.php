@@ -31,25 +31,61 @@ class DeactivatedUserController
      */
     public function index()
     {
-        return view('backend.auth.user.deactivated');
+        $deactivatedUsers = User::where('active', 0)->get();
+        return view('backend.auth.user.deactivated', compact('deactivatedUsers'));
     }
 
     /**
-     * @param  Request  $request
      * @param  User  $user
-     * @param $status
+     * @param  Request  $request
+     * @param  int  $status
      * @return mixed
      *
      * @throws \App\Exceptions\GeneralException
      */
-    public function update(Request $request, User $user, $status)
+    public function update(User $user, Request $request, $status)
     {
         $this->userService->mark($user, (int) $status);
 
         return redirect()->route(
-            (int) $status === 1 || ! $request->user()->can('admin.access.user.reactivate') ?
-                'admin.auth.user.index' :
-                'admin.auth.user.deactivated'
+            (int) $status === 1 || !$request->user()->can('admin.access.user.reactivate') ?
+            'admin.auth.user.index' :
+            'admin.auth.user.deactivated'
         )->withFlashSuccess(__('The user was successfully updated.'));
+    }
+
+
+    /**
+     * Deactivate the specified user.
+     *
+     * @param  User  $user
+     * @return mixed
+     */
+    public function deactivate(User $user)
+    {
+        try {
+            $this->userService->mark($user, 0);
+            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully deactivated.'));
+        } catch (\Exception $e) {
+            \Log::error('Error deactivating user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem deactivating this user. Please try again.'));
+        }
+    }
+
+    /**
+     * Reactivate the specified user.
+     *
+     * @param  User  $user
+     * @return mixed
+     */
+    public function reactivate(User $user)
+    {
+        try {
+            $this->userService->mark($user, 1);
+            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully reactivated.'));
+        } catch (\Exception $e) {
+            \Log::error('Error reactivating user: ' . $e->getMessage());
+            return redirect()->back()->withErrors(__('There was a problem reactivating this user. Please try again.'));
+        }
     }
 }
