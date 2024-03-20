@@ -3,7 +3,8 @@
 namespace App\Domains\Auth\Http\Controllers\Frontend\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Domains\Auth\Services\UserService;
+use App\Domains\Auth\Events\TwoFactor\TwoFactorDisabled;
 
 /**
  * Class TwoFactorAuthenticationController.
@@ -50,26 +51,29 @@ class TwoFactorAuthenticationController
      * Disable two-factor authentication for the authenticated user.
      *
      * @param  Request  $request
+     * @param  UserService  $userService
      * @return mixed
      */
-    public function destroy(Request $request)
+    public function disable(Request $request, UserService $userService)
     {
-        // Retrieve the authenticated user
-        $user = Auth::user();
+        $validatedData = $request->validate([
+            'code' => ['required', 'max:10', 'totp_code'],
+        ]);
 
-        // Invalidate the user's secret key
-        $user->laraguard_secret = null;
+        $user = $request->user();
 
-        // Invalidate the user's recovery codes
-        $user->laraguard_recovery = [];
+        // Check if the entered code matches the user's 2FA code
+        if (!$user->laraguard()->verify($validatedData['code'])) {
+            return redirect()->back()->withErrors(['code' => 'Invalid verification code.']);
+        }
 
-        // Save the changes to the user
-        $user->save();
+        // Disable two-factor authentication for the user
+        $user->laraguard()->disable();
 
-        // Flash a success message
-        session()->flash('flash_warning', __('Two-factor authentication has been disabled.'));
+        // Dispatch an event indicating that two-factor authentication has been disabled
+        event(new TwoFactorDisabled($user));
 
-        // Redirect the user to the two-factor authentication settings page
-        return redirect()->route('frontend.auth.account.2fa.show')->withFlashSuccess(__('Two-factor authentication disabled'));
+        // Redirect the user to a success page or any desired destination
+        return redirect()->route('home')->with('success', 'Two-factor authentication has been disabled.');
     }
 }
