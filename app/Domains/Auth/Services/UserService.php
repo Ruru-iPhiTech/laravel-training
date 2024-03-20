@@ -131,18 +131,20 @@ class UserService extends BaseService
 
     /**
      * @param  array  $data
+     * @param  array  $permissions
      * @return User
      *
      * @throws GeneralException
-     * @throws \Throwable
      */
-    public function store(array $data = []): User
+    public function store(array $data = [], array $permissions = []): User
     {
         DB::beginTransaction();
 
+        $type = $data['type'] === User::TYPE_ADMIN ? User::TYPE_ADMIN : User::TYPE_USER;
+
         try {
             $user = $this->createUser([
-                'type' => $data['type'],
+                'type' => $type,
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $data['password'],
@@ -152,12 +154,13 @@ class UserService extends BaseService
 
             $user->syncRoles($data['roles'] ?? []);
 
-            if (!config('boilerplate.access.user.only_roles')) {
+            if (!empty ($permissions)) {
+                $user->syncPermissions($permissions);
+            } elseif (!config('boilerplate.access.user.only_roles')) {
                 $user->syncPermissions($data['permissions'] ?? []);
             }
         } catch (Exception $e) {
             DB::rollBack();
-
             throw new GeneralException(__('There was a problem creating this user. Please try again.'));
         }
 
@@ -166,12 +169,14 @@ class UserService extends BaseService
         DB::commit();
 
         // They didn't want to auto verify the email, but do they want to send the confirmation email to do so?
+
         if (!isset ($data['email_verified']) && isset ($data['send_confirmation_email']) && $data['send_confirmation_email'] === '1') {
             $user->sendEmailVerificationNotification();
         }
 
         return $user;
     }
+
 
     /**
      * @param  User  $user
@@ -184,15 +189,14 @@ class UserService extends BaseService
     {
         DB::beginTransaction();
 
+        $type = $data['type'] === User::TYPE_ADMIN ? User::TYPE_ADMIN : User::TYPE_USER;
+
         try {
             $userData = [
                 'name' => $data['name'],
+                'type' => $type,
                 'email' => $data['email'],
             ];
-
-            if (isset ($data['type'])) {
-                $userData['type'] = $data['type'];
-            }
 
             $user->update($userData);
 
