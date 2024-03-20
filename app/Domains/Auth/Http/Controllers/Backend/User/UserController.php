@@ -6,6 +6,7 @@ use App\Domains\Auth\Http\Requests\Backend\User\DeleteUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\EditUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\StoreUserRequest;
 use App\Domains\Auth\Http\Requests\Backend\User\UpdateUserRequest;
+use App\Domains\Auth\Http\Controllers\Backend\User\DeactivatedUserController;
 use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
@@ -136,38 +137,9 @@ class UserController
         }
     }
 
-    /**
-     * Deactivate the specified user.
-     *
-     * @param  User  $user
-     * @return mixed
-     */
-    public function deactivate(User $user)
+    public function deactivated(DeactivatedUserController $deactivatedUserController)
     {
-        try {
-            $this->userService->mark($user, 0);
-            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully deactivated.'));
-        } catch (\Exception $e) {
-            \Log::error('Error deactivating user: ' . $e->getMessage());
-            return redirect()->back()->withErrors(__('There was a problem deactivating this user. Please try again.'));
-        }
-    }
-
-    /**
-     * Reactivate the specified user.
-     *
-     * @param  User  $user
-     * @return mixed
-     */
-    public function reactivate(User $user)
-    {
-        try {
-            $this->userService->mark($user, 1);
-            return redirect()->route('admin.auth.user.index')->withFlashSuccess(__('The user was successfully reactivated.'));
-        } catch (\Exception $e) {
-            \Log::error('Error reactivating user: ' . $e->getMessage());
-            return redirect()->back()->withErrors(__('There was a problem reactivating this user. Please try again.'));
-        }
+        return $deactivatedUserController->index();
     }
 
     /**
