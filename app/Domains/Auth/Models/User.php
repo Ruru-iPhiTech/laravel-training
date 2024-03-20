@@ -54,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         'name',
         'email',
         'password',
+        'active',
     ];
 
     /**
