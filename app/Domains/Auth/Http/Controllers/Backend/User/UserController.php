@@ -11,7 +11,6 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
 use App\Domains\Auth\Services\UserService;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserController.
@@ -76,22 +75,20 @@ class UserController
     public function store(StoreUserRequest $request)
     {
         try {
-            $user = $this->userService->createFromArray($request->validated());
+            $data = $request->validated();
+            $userType = $data['type'] ?? User::TYPE_USER;
+
+            if ($userType === User::TYPE_USER) {
+                $user = $this->userService->createFromArray($data);
+            } else {
+                $user = $this->userService->store($data);
+            }
+
             return redirect()->route('admin.auth.user.show', $user)->withFlashSuccess(__('The user was successfully created.'));
         } catch (\Exception $e) {
             \Log::error('Error creating user: ' . $e->getMessage());
             return redirect()->back()->withInput()->withErrors(__('There was a problem creating this user. Please try again.'));
         }
-    }
-
-    public function createFromArray(array $data): User
-    {
-        return User::create([
-            'type' => $data['type'],
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
     }
 
     /**
