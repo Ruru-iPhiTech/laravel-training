@@ -41,6 +41,7 @@ Route::prefix('admin/auth')->middleware('auth')->group(function () {
     // User management
     Route::prefix('user')->name('admin.auth.user.')->group(function () {
         Route::get('deleted', [DeletedUserController::class, 'index'])->name('deleted');
+        Route::get('deactivated', [DeactivatedUserController::class, 'index'])->name('deactivated');
         Route::get('create', [UserController::class, 'create'])->name('create');
         Route::post('store', [UserController::class, 'store'])->name('store');
         Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
@@ -50,10 +51,9 @@ Route::prefix('admin/auth')->middleware('auth')->group(function () {
         Route::delete('{deletedUser}/permanently-delete', [DeletedUserController::class, 'destroy'])->name('permanently-delete');
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('{user}', [UserController::class, 'show'])->name('show');
-        Route::get('deactivated', [UserController::class, 'index'])->name('deactivated');
-        Route::post('{user}/deactivate', [UserController::class, 'deactivate'])->name('deactivate');
-        Route::post('{user}/reactivate', [UserController::class, 'reactivate'])->name('reactivate');
-        Route::post('{user}/mark/{status}', [DeactivatedUserController::class, 'update'])->name('mark')->where(['status' => '[0,1]']);
+        Route::post('{user}/deactivate', [DeactivatedUserController::class, 'deactivate'])->name('deactivate');
+        Route::post('{user}/reactivate', [DeactivatedUserController::class, 'reactivate'])->name('reactivate');
+        Route::match (['post', 'patch'], '{user}/mark/{status}', [DeactivatedUserController::class, 'update'])->name('mark')->where(['status' => '[0,1]']);
         Route::post('{user}/clear-session', [UserSessionController::class, 'update'])->name('clear-session');
         Route::get('{user}/change-password', [UserPasswordController::class, 'edit'])->name('change-password');
         Route::patch('{user}/change-password', [UserPasswordController::class, 'update'])->name('change-password.update');
