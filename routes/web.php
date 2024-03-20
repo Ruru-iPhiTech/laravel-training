@@ -64,7 +64,7 @@ Route::prefix('admin/auth')->middleware('auth')->group(function () {
         Route::get('create', [RoleController::class, 'create'])->name('create');
         Route::post('store', [RoleController::class, 'store'])->name('store');
         Route::get('{role}/edit', [RoleController::class, 'edit'])->name('edit');
-        Route::put('{role}', [RoleController::class, 'update'])->name('update');
+        Route::match (['post', 'patch'], '{role}', [RoleController::class, 'update'])->name('update');
         Route::delete('{role}', [RoleController::class, 'destroy'])->name('destroy');
     });
 });
